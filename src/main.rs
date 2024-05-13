@@ -24,7 +24,7 @@ fn main() -> Result<(), std::io::Error> {
         }
     };
 
-    debug!("Comparing\n{:x?}\nto\n{:x?}", given_hash, result_hash);
+    debug!("Comparing\n{:x?} to\n{:x?}", given_hash, result_hash);
     if !result_hash.eq(given_hash) {
         println!("File doesn't match hash");
     } else {
@@ -35,7 +35,7 @@ fn main() -> Result<(), std::io::Error> {
 }
 
 fn display_help(args: &Vec<String>) {
-    println!("Expected: {} <filename> <hash>", args[0]);
+    println!("Invalid args, expected: {} <filename> <expected-hash>", args[0]);
 }
 
 fn sha256_hash(data: &[u8]) -> String {
