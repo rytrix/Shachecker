@@ -8,9 +8,15 @@ fn main() -> Result<(), std::io::Error> {
 
     let args: Vec<String> = std::env::args().collect();
     if args.len() < 3 {
+        if args.len() == 2 {
+            if args[1] == "--help" || args[1] == "help" {
+                display_help(&args);
+                return Ok(())
+            }
+        }
         println!("Invalid args");
         display_help(&args);
-        return Ok(());
+        return Ok(())
     }
 
     if args[1] == "--sha256" {
@@ -18,13 +24,13 @@ fn main() -> Result<(), std::io::Error> {
         let buf_reader = BufReader::new(file_handle);
         let hash = sha_hash(buf_reader, &SHA256)?;
         println!("{}", hash);
-        return Ok(());
+        return Ok(())
     } else if args[1] == "--sha512" {
         let file_handle = std::fs::File::open(&args[2])?;
         let buf_reader = BufReader::new(file_handle);
         let hash = sha_hash(buf_reader, &SHA512)?;
         println!("{}", hash);
-        return Ok(());
+        return Ok(())
     }
 
     let file = &args[1];
@@ -38,7 +44,7 @@ fn main() -> Result<(), std::io::Error> {
         128 => sha_hash(buf_reader, &SHA512)?,
         _ => {
             println!("Invalid hash length");
-            return Ok(());
+            return Ok(())
         }
     };
 
