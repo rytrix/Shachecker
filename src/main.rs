@@ -59,6 +59,7 @@ fn main() -> Result<(), std::io::Error> {
 }
 
 fn display_help(args: &Vec<String>) {
+    println!("Usage:");
     println!("{} <filename> <expected-hash>", args[0]);
     println!("{} sha{{256,512}} <filename>", args[0]);
 }
