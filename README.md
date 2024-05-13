@@ -6,4 +6,4 @@ additionally can generate sha256 and sha512 hashes with --sha256 or --sha512 res
 # Usage
 shachecker filename expected-hash
 
-shachecker sha{256,512} filename
+shachecker --sha{256,512} filename
