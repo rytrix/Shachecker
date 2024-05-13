@@ -14,7 +14,6 @@ fn main() -> Result<(), std::io::Error> {
                 return Ok(())
             }
         }
-        println!("Invalid args");
         display_help(&args);
         return Ok(())
     }
@@ -60,8 +59,8 @@ fn main() -> Result<(), std::io::Error> {
 
 fn display_help(args: &Vec<String>) {
     println!("Usage:");
-    println!("{} <filename> <expected-hash>", args[0]);
-    println!("{} --sha{{256,512}} <filename>", args[0]);
+    println!("  {} <filename> <expected-hash>", args[0]);
+    println!("  {} --sha{{256,512}} <filename>", args[0]);
 }
 
 fn sha_hash(
