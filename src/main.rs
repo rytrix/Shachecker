@@ -8,7 +8,22 @@ fn main() -> Result<(), std::io::Error> {
 
     let args: Vec<String> = std::env::args().collect();
     if args.len() < 3 {
+        println!("Invalid args");
         display_help(&args);
+        return Ok(());
+    }
+
+    if args[1] == "--sha256" {
+        let file_handle = std::fs::File::open(&args[2])?;
+        let buf_reader = BufReader::new(file_handle);
+        let hash = sha_hash(buf_reader, &SHA256)?;
+        println!("{}", hash);
+        return Ok(());
+    } else if args[1] == "--sha512" {
+        let file_handle = std::fs::File::open(&args[2])?;
+        let buf_reader = BufReader::new(file_handle);
+        let hash = sha_hash(buf_reader, &SHA512)?;
+        println!("{}", hash);
         return Ok(());
     }
 
@@ -38,16 +53,20 @@ fn main() -> Result<(), std::io::Error> {
 }
 
 fn display_help(args: &Vec<String>) {
-    println!("Invalid args, expected: {} <filename> <expected-hash>", args[0]);
+    println!("{} <filename> <expected-hash>", args[0]);
+    println!("{} sha{{256,512}} <filename>", args[0]);
 }
 
-fn sha_hash(mut reader: impl Read, algorithm: &'static ring::digest::Algorithm) -> Result<String, std::io::Error> {
+fn sha_hash(
+    mut reader: impl Read,
+    algorithm: &'static ring::digest::Algorithm,
+) -> Result<String, std::io::Error> {
     let mut ctx = Context::new(algorithm);
     let mut buffer = [0; 1024];
     loop {
         let amount = reader.read(&mut buffer)?;
         if amount == 0 {
-            break
+            break;
         }
         ctx.update(&buffer[..amount]);
     }
