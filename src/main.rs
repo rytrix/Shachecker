@@ -1,3 +1,5 @@
+use std::io::{BufReader, Read};
+
 use log::debug;
 use ring::digest::{Context, SHA256, SHA512};
 
@@ -13,11 +15,12 @@ fn main() -> Result<(), std::io::Error> {
     let file = &args[1];
     let given_hash = &args[2].to_lowercase();
 
-    let data = std::fs::read(file)?;
+    let file_handle = std::fs::File::open(file)?;
+    let buf_reader = BufReader::new(file_handle);
 
     let result_hash = match given_hash.len() {
-        64 => sha256_hash(data.as_slice()),
-        128 => sha512_hash(data.as_slice()),
+        64 => sha_hash(buf_reader, &SHA256)?,
+        128 => sha_hash(buf_reader, &SHA512)?,
         _ => {
             println!("Invalid hash length");
             return Ok(());
@@ -38,16 +41,16 @@ fn display_help(args: &Vec<String>) {
     println!("Invalid args, expected: {} <filename> <expected-hash>", args[0]);
 }
 
-fn sha256_hash(data: &[u8]) -> String {
-    let mut ctx = Context::new(&SHA256);
-    ctx.update(data);
+fn sha_hash(mut reader: impl Read, algorithm: &'static ring::digest::Algorithm) -> Result<String, std::io::Error> {
+    let mut ctx = Context::new(algorithm);
+    let mut buffer = [0; 1024];
+    loop {
+        let amount = reader.read(&mut buffer)?;
+        if amount == 0 {
+            break
+        }
+        ctx.update(&buffer[..amount]);
+    }
     let digest = ctx.finish();
-    data_encoding::HEXLOWER.encode(digest.as_ref())
-}
-
-fn sha512_hash(data: &[u8]) -> String {
-    let mut ctx = Context::new(&SHA512);
-    ctx.update(data);
-    let digest = ctx.finish();
-    data_encoding::HEXLOWER.encode(digest.as_ref())
+    Ok(data_encoding::HEXLOWER.encode(digest.as_ref()))
 }
